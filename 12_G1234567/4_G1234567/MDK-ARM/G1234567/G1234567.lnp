@@ -6,6 +6,7 @@
 "g1234567\stm32g4xx_it.o"
 "g1234567\stm32g4xx_hal_msp.o"
 "g1234567\lcd.o"
+"g1234567\tim.o"
 "g1234567\stm32g4xx_hal_tim.o"
 "g1234567\stm32g4xx_hal_tim_ex.o"
 "g1234567\stm32g4xx_hal_pwr_ex.o"

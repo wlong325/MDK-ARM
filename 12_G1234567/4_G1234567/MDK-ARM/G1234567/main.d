@@ -28,8 +28,11 @@ g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h
 g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h
 g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h
 g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr_ex.h
+g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim.h
+g1234567\main.o: ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h
 g1234567\main.o: ../Core/Inc/gpio.h
 g1234567\main.o: ../Core/Inc/led.h
 g1234567\main.o: ../Core/Inc/key.h
 g1234567\main.o: ../Core/Inc/lcd.h
 g1234567\main.o: E:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+g1234567\main.o: ../Core/Inc/tim.h

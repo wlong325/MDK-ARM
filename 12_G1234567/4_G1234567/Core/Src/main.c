@@ -27,6 +27,7 @@
 #include "key.h"
 #include "lcd.h"
 #include "stdio.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,22 +49,33 @@ void Key_Proc(void);
 
 /* USER CODE BEGIN PV */
 //Variables
-int CNBR_Size = 0;
-int VNBR_Size = 0;
-int IDEL_Size = 8;	
+signed char B1 = -1;
+signed char B2 = -1;
+signed char B3 = -1;
 
-float CNBR_Price = 3.50f;
-float VNBR_Price = 2.00f;
+char KeyX[3] = {1,2,3};
+char Kerror = 0;
 
-char Show_CNBR[20];
-char Show_VNBR[20];
-char Show_IDLE[20];	
+int F = 2000;
+int D = 10;
 
-char Show_CNBR_Price[20];
-char Show_VNBR_Price[20];
+char Show_B1[20];
+char Show_B2[20];
+char Show_B3[20];	
+
+char Show_F[20];
+char Show_D[20];
 
 //Flags
-char Show_Flag = 0; //LCD½çÃæÇÐ»»±êÖ¾
+char Show_Flag = 0; //LCDï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Ö¾
+
+//LED timing (TIM17 1ms tick, shared with ISR -> volatile)
+volatile uint16_t LD1_Cnt = 0;
+volatile uint8_t  LED1_Flag = 0;
+volatile uint8_t  LED1_TimeUp = 0;
+volatile uint16_t LD2_Cnt = 0;
+volatile uint8_t  LED2_Flag = 0;
+volatile uint8_t  LED2_TimeUp = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -108,8 +120,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+	MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start_IT(&htim17);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -180,12 +193,15 @@ void SystemClock_Config(void)
 //Update Variables
 void Var_Update(void)
 {
-	sprintf(Show_CNBR,"    CNBR:%d           ", CNBR_Size);
-	sprintf(Show_VNBR,"    VNBR:%d           ", VNBR_Size);
-	sprintf(Show_IDLE,"    IDLE:%d           ", IDEL_Size);	
+	if(B1==-1)sprintf(Show_B1,"    B1:@              ");
+	else sprintf(Show_B1,"    B1:%d             ", B1);
+	if(B2==-1)sprintf(Show_B2,"    B2:@              ");
+	else sprintf(Show_B2,"    B2:%d             ", B2);
+	if(B3==-1)sprintf(Show_B3,"    B3:@              ");
+	else sprintf(Show_B3,"    B3:%d             ", B3);	
 	
-	sprintf(Show_CNBR_Price,"    CNBR:%.2f     ", CNBR_Price);
-	sprintf(Show_VNBR_Price,"    VNBR:%.2f     ", VNBR_Price);
+	sprintf(Show_F,"    F:%dHz        ", F);
+	sprintf(Show_D,"    D:%d%%         ", D);
 }
 
 
@@ -194,14 +210,14 @@ void Var_Update(void)
 void LCD_Proc(void)
 {			
 	if(Show_Flag == 0){ 
-		LCD_DisplayStringLine(Line1, (uint8_t *)"        Data");
-		LCD_DisplayStringLine(Line3, (uint8_t *)Show_CNBR);
-		LCD_DisplayStringLine(Line5, (uint8_t *)Show_VNBR);
-		LCD_DisplayStringLine(Line7, (uint8_t *)Show_IDLE);
+		LCD_DisplayStringLine(Line1, (uint8_t *)"       PSD");
+		LCD_DisplayStringLine(Line3, (uint8_t *)Show_B1);
+		LCD_DisplayStringLine(Line5, (uint8_t *)Show_B2);
+		LCD_DisplayStringLine(Line7, (uint8_t *)Show_B3);
 	}else if(Show_Flag == 1){
-		LCD_DisplayStringLine(Line1, (uint8_t *)"        Para");
-		LCD_DisplayStringLine(Line3, (uint8_t *)Show_CNBR_Price);
-		LCD_DisplayStringLine(Line5, (uint8_t *)Show_VNBR_Price);
+		LCD_DisplayStringLine(Line1, (uint8_t *)"       STA");
+		LCD_DisplayStringLine(Line3, (uint8_t *)Show_F);
+		LCD_DisplayStringLine(Line5, (uint8_t *)Show_D);
 		LCD_DisplayStringLine(Line7, (uint8_t *)"                    ");			
 	}
 }
@@ -211,10 +227,10 @@ uint8_t Key_Scan(void)
 	char key_value = 0;
 
 	if(Press(KB1) == 0)	{	//key1
-		HAL_Delay(2); //È¥¶¶
+		HAL_Delay(2); //È¥ï¿½ï¿½
 		if(Press(KB1) == 0){
 			key_value = 1;
-			while(Press(KB1) == 0);	//°´¼üËÉ¿ªÐ§¹û		
+			while(Press(KB1) == 0);	//ï¿½ï¿½ï¿½ï¿½ï¿½É¿ï¿½Ð§ï¿½ï¿½		
 		}
 	}else	if(Press(KB2) == 0)	{ //key2
 		HAL_Delay(2); 
@@ -251,28 +267,31 @@ void Key_Proc(void)
 	switch(cur_key)
 	{
 		case 1:
-			Show_Flag ++;
-			Show_Flag %= 2;
+			B1++;
+		  B1%=10;
 			break;
 		case 2:
-			if(Show_Flag == 1)
-			{
-				CNBR_Price += 0.5f;
-				VNBR_Price += 0.5f;						
-			}
+			B2++;
+		  B2%=10;
 			break;
 		case 3:
-			if(Show_Flag == 1)
-			{
-				CNBR_Price -= 0.5f;
-				VNBR_Price -= 0.5f;
-				if(CNBR_Price < 0)
-					CNBR_Price = 0.0f;
-				if(VNBR_Price < 0)
-					VNBR_Price = 0.0f;											
-			}
+			B3++;
+		  B3%=10;
 			break;
 		case 4:
+			if(KeyX[0]==B1&&KeyX[1]==B2&&KeyX[2]==B3){
+				Show_Flag++;
+				LED1_Flag = 1;
+				LD1_Cnt = 0;
+				LED_Ctrl(LED1, ON);
+			}
+			else{
+				Kerror++;
+				if(Kerror >= 3){
+					LED2_Flag = 1;
+					LD2_Cnt = 0;
+				}
+			}
 			break;		
 		default:
 			;
@@ -281,10 +300,28 @@ void Key_Proc(void)
 
 void Led_Proc(void)
 {
-	if(IDEL_Size > 0)
-		LED_Ctrl(LED1, ON);
-	else
+	if(LED1_TimeUp){
 		LED_Ctrl(LED1, OFF);
+		LED1_TimeUp = 0;
+	}
+
+	if(LED2_Flag){
+		if((LD2_Cnt / 100) % 2)	LED_Ctrl(LED2, ON);
+		else					LED_Ctrl(LED2, OFF);
+	}
+	else if(LED2_TimeUp){
+		LED_Ctrl(LED2, OFF);
+		LED2_TimeUp = 0;
+	}
+}
+
+//TIM17 1ms interrupt callback
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM17){
+		if(LED1_Flag && ++LD1_Cnt >= 5000){ LED1_Flag = 0; LD1_Cnt = 0; LED1_TimeUp = 1; }
+		if(LED2_Flag && ++LD2_Cnt >= 5000){ LED2_Flag = 0; LD2_Cnt = 0; LED2_TimeUp = 1; }
+	}
 }
 
 /* USER CODE END 4 */
