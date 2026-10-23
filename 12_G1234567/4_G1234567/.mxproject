@@ -7,26 +7,28 @@ HeaderPath=..\Drivers\STM32G4xx_HAL_Driver\Inc;..\Drivers\STM32G4xx_HAL_Driver\I
 CDefines=USE_HAL_DRIVER;STM32G431xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousUsedKeilFiles]
-SourceFiles=..\Core\Src\main.c;..\Core\Src\gpio.c;..\Core\Src\stm32g4xx_it.c;..\Core\Src\stm32g4xx_hal_msp.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c;..\Core\Src/system_stm32g4xx.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c;..\Core\Src/system_stm32g4xx.c;..\Drivers/CMSIS/Device/ST/STM32G4xx/Source/Templates/system_stm32g4xx.c;;
+SourceFiles=..\Core\Src\main.c;..\Core\Src\gpio.c;..\Core\Src\tim.c;..\Core\Src\stm32g4xx_it.c;..\Core\Src\stm32g4xx_hal_msp.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c;..\Core\Src/system_stm32g4xx.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_tim_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_rcc_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_flash_ramfunc.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_gpio.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_exti.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_dma_ex.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_pwr.c;..\Drivers/STM32G4xx_HAL_Driver/Src/stm32g4xx_hal_cortex.c;..\Core\Src/system_stm32g4xx.c;..\Drivers/CMSIS/Device/ST/STM32G4xx/Source/Templates/system_stm32g4xx.c;;
 HeaderPath=..\Drivers\STM32G4xx_HAL_Driver\Inc;..\Drivers\STM32G4xx_HAL_Driver\Inc\Legacy;..\Drivers\CMSIS\Device\ST\STM32G4xx\Include;..\Drivers\CMSIS\Include;..\Core\Inc;
 CDefines=USE_HAL_DRIVER;STM32G431xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
 AdvancedFolderStructure=true
-HeaderFileListSize=4
-HeaderFiles#0=D:/2024_G431/G1234567/Core/Inc/gpio.h
-HeaderFiles#1=D:/2024_G431/G1234567/Core/Inc/stm32g4xx_it.h
-HeaderFiles#2=D:/2024_G431/G1234567/Core/Inc/stm32g4xx_hal_conf.h
-HeaderFiles#3=D:/2024_G431/G1234567/Core/Inc/main.h
+HeaderFileListSize=5
+HeaderFiles#0=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc/gpio.h
+HeaderFiles#1=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc/tim.h
+HeaderFiles#2=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc/stm32g4xx_it.h
+HeaderFiles#3=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc/stm32g4xx_hal_conf.h
+HeaderFiles#4=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc/main.h
 HeaderFolderListSize=1
-HeaderPath#0=D:/2024_G431/G1234567/Core/Inc
+HeaderPath#0=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Inc
 HeaderFiles=;
-SourceFileListSize=4
-SourceFiles#0=D:/2024_G431/G1234567/Core/Src/gpio.c
-SourceFiles#1=D:/2024_G431/G1234567/Core/Src/stm32g4xx_it.c
-SourceFiles#2=D:/2024_G431/G1234567/Core/Src/stm32g4xx_hal_msp.c
-SourceFiles#3=D:/2024_G431/G1234567/Core/Src/main.c
+SourceFileListSize=5
+SourceFiles#0=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src/gpio.c
+SourceFiles#1=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src/tim.c
+SourceFiles#2=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src/stm32g4xx_it.c
+SourceFiles#3=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src/stm32g4xx_hal_msp.c
+SourceFiles#4=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src/main.c
 SourceFolderListSize=1
-SourcePath#0=D:/2024_G431/G1234567/Core/Src
+SourcePath#0=E:/桌面文件/嵌入式系统/12_G1234567/4_G1234567/Core/Src
 SourceFiles=;
 

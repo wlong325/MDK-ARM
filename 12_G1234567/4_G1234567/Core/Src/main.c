@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+﻿/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -27,7 +28,6 @@
 #include "key.h"
 #include "lcd.h"
 #include "stdio.h"
-#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,15 +67,22 @@ char Show_F[20];
 char Show_D[20];
 
 //Flags
-char Show_Flag = 0; //LCD�����л���־
+char Show_Flag = 0; //LCD界面切换标志
 
-//LED timing (TIM17 1ms tick, shared with ISR -> volatile)
-volatile uint16_t LD1_Cnt = 0;
-volatile uint8_t  LED1_Flag = 0;
-volatile uint8_t  LED1_TimeUp = 0;
-volatile uint16_t LD2_Cnt = 0;
-volatile uint8_t  LED2_Flag = 0;
-volatile uint8_t  LED2_TimeUp = 0;
+//时间基准（TIM17 1ms 节拍，由中断写入 -> 需 volatile）
+volatile uint32_t g_ms_tick = 0;
+
+//按键事件（Key_Proc 写入，Data_Proc 消费）
+uint8_t Pwd_OK_Event  = 0;
+uint8_t Pwd_Err_Event = 0;
+
+//LED 状态与输出信号（由 Data_Proc 管理）
+uint32_t LD1_Start = 0;
+uint8_t  LD1_Active = 0;
+uint8_t  LD1_Out = 0;
+uint32_t LD2_Start = 0;
+uint8_t  LD2_Active = 0;
+uint8_t  LD2_Out = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,6 +91,7 @@ void SystemClock_Config(void);
 void Var_Update(void);
 void LCD_Proc(void);
 void Key_Proc(void);
+void Data_Proc(void);
 void Led_Proc(void);
 /* USER CODE END PFP */
 
@@ -120,7 +128,8 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-	MX_TIM17_Init();
+  MX_TIM2_Init();
+  MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim17);
   /* USER CODE END 2 */
@@ -138,6 +147,7 @@ int main(void)
 		Var_Update();	
 		LCD_Proc();
 		Key_Proc();	
+		Data_Proc();	
 		Led_Proc();	
     /* USER CODE END WHILE */
 
@@ -193,12 +203,21 @@ void SystemClock_Config(void)
 //Update Variables
 void Var_Update(void)
 {
-	if(B1==-1)sprintf(Show_B1,"    B1:@              ");
-	else sprintf(Show_B1,"    B1:%d             ", B1);
-	if(B2==-1)sprintf(Show_B2,"    B2:@              ");
-	else sprintf(Show_B2,"    B2:%d             ", B2);
-	if(B3==-1)sprintf(Show_B3,"    B3:@              ");
-	else sprintf(Show_B3,"    B3:%d             ", B3);	
+	if(B1==-1){
+		sprintf(Show_B1,"    B1:@              ");
+	}else {
+		sprintf(Show_B1,"    B1:%d             ", B1);
+	}
+	if(B2==-1){
+		sprintf(Show_B2,"    B2:@              ");
+	}else{
+		sprintf(Show_B2,"    B2:%d             ", B2);
+	}
+	if(B3==-1){
+		sprintf(Show_B3,"    B3:@              ");
+	}else{
+		sprintf(Show_B3,"    B3:%d             ", B3);	
+	}
 	
 	sprintf(Show_F,"    F:%dHz        ", F);
 	sprintf(Show_D,"    D:%d%%         ", D);
@@ -227,10 +246,10 @@ uint8_t Key_Scan(void)
 	char key_value = 0;
 
 	if(Press(KB1) == 0)	{	//key1
-		HAL_Delay(2); //ȥ��
+		HAL_Delay(2); //去抖
 		if(Press(KB1) == 0){
 			key_value = 1;
-			while(Press(KB1) == 0);	//�����ɿ�Ч��		
+			while(Press(KB1) == 0);	//等待按键松开
 		}
 	}else	if(Press(KB2) == 0)	{ //key2
 		HAL_Delay(2); 
@@ -281,16 +300,13 @@ void Key_Proc(void)
 		case 4:
 			if(KeyX[0]==B1&&KeyX[1]==B2&&KeyX[2]==B3){
 				Show_Flag++;
-				LED1_Flag = 1;
-				LD1_Cnt = 0;
-				LED_Ctrl(LED1, ON);
+				Pwd_OK_Event = 1;
 			}
 			else{
-				Kerror++;
-				if(Kerror >= 3){
-					LED2_Flag = 1;
-					LD2_Cnt = 0;
-				}
+				B1=-1;
+				B2=-1;
+				B3=-1;
+				Pwd_Err_Event = 1;
 			}
 			break;		
 		default:
@@ -298,29 +314,53 @@ void Key_Proc(void)
 	}
 }
 
-void Led_Proc(void)
+//数据处理：消费事件 -> 驱动 LED 状态机 -> 输出信号
+void Data_Proc(void)
 {
-	if(LED1_TimeUp){
-		LED_Ctrl(LED1, OFF);
-		LED1_TimeUp = 0;
+	//1. 消费按键事件
+	if(Pwd_OK_Event){
+		Pwd_OK_Event = 0;
+		LD1_Active = 1;
+		LD1_Start = g_ms_tick;
+	}
+	if(Pwd_Err_Event){
+		Pwd_Err_Event = 0;
+		Kerror++;
+		if(Kerror >= 3){
+			LD2_Active = 1;
+			LD2_Start = g_ms_tick;
+		}
 	}
 
-	if(LED2_Flag){
-		if((LD2_Cnt / 100) % 2)	LED_Ctrl(LED2, ON);
-		else					LED_Ctrl(LED2, OFF);
+	//2. 状态机 -> 输出信号
+	if(LD1_Active){
+		if(g_ms_tick - LD1_Start >= 5000){
+			LD1_Active = 0; LD1_Out = 0;
+		}else{
+			LD1_Out = 1;
+		}
 	}
-	else if(LED2_TimeUp){
-		LED_Ctrl(LED2, OFF);
-		LED2_TimeUp = 0;
+	if(LD2_Active){
+		if(g_ms_tick - LD2_Start >= 5000){
+			LD2_Active = 0; LD2_Out = 0;
+		}else{
+			LD2_Out = (g_ms_tick - LD2_Start) / 100 % 2;
+		}
 	}
 }
 
-//TIM17 1ms interrupt callback
+//LED 输出：仅根据信号点灯灭灯
+void Led_Proc(void)
+{
+	LED_Ctrl(LED1, LD1_Out ? ON : OFF);
+	LED_Ctrl(LED2, LD2_Out ? ON : OFF);
+}
+
+//TIM17 1ms 中断回调：仅作时间源
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance == TIM17){
-		if(LED1_Flag && ++LD1_Cnt >= 5000){ LED1_Flag = 0; LD1_Cnt = 0; LED1_TimeUp = 1; }
-		if(LED2_Flag && ++LD2_Cnt >= 5000){ LED2_Flag = 0; LD2_Cnt = 0; LED2_TimeUp = 1; }
+		g_ms_tick++;
 	}
 }
 
